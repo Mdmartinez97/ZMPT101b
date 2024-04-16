@@ -1,22 +1,20 @@
-#include "EmonLib.h"
-EnergyMonitor emon1;    // Crea una instancia de Energy Monitor
-#define VOLT_CAL 350    // Valor de calibración del sensor
-#define PHASE_SHIFT 1.7 // Defasaje
-#define ZMPTpin A0      // Sensor de Tensión GPIO
+#include <ZMPT101B.h>
 
-//******************************************** SETUP ********************************************************************
+#define SENSITIVITY 500 //Sensibilidad, calibrar con ejemplo en librería
+
+ZMPT101B voltageSensor(A0, 50); // (GPIO Pin, Frecuencia de red)
+
 void setup() {
- 
- Serial.begin(115200);
- emon1.voltage(ZMPTpin, VOLT_CAL, PHASE_SHIFT); //Configuración de función 'voltage' (Pin de lectura, Calibración, Defasaje)
+  Serial.begin(115200);
+  pinMode(A0, INPUT);
+  voltageSensor.setSensitivity(SENSITIVITY);
 }
-//******************************************** LOOP ********************************************************************
+
 void loop() {
 
- emon1.calcVI(20,2000); //Función de cálculo (20 semiciclos, tiempo de espera para tomar medición) 
- 
- int tension = emon1.Vrms; //Valor V RMS obtenido
+  float voltage = voltageSensor.getRmsVoltage(); // Leer sensor en VRMS
 
- Serial.print(tension);
- Serial.println("V RMS");
+  Serial.println(voltage);
+
+  delay(1000);
 }
